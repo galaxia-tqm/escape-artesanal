@@ -9,7 +9,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
+    height: 100dvh;
     margin: 0;
 
 -webkit-user-select: none; /* Safari / Chrome / Mobile */
@@ -467,12 +467,12 @@ ul {
 /* Texto pequeño "créditos" en la pantalla de inicio */
 .credits-footer {
     position: absolute;
-    bottom: 15px; 
+    bottom: 90px; 
     left: 50%;
     transform: translateX(-50%);
     font-family: 'Press Start 2P', cursive;
     font-size: 0.55rem; 
-    color: rgba(255, 255, 255, 0.7); 
+    color: #fff; 
     cursor: pointer;
     text-transform: lowercase;
     z-index: 70; 

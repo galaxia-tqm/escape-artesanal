@@ -345,7 +345,6 @@ function showVictoryScreen(type) {
     endScreen.style.backgroundPosition = 'center';
     endScreen.style.backgroundRepeat = 'no-repeat';
 
-    // THIS OVERWRITES THE HTML. restartToCharacterSelect MUST FIX THIS.
     endScreen.innerHTML = `
         <div style="
             position: absolute;
@@ -359,11 +358,27 @@ function showVictoryScreen(type) {
             justify-content: center; 
             background: rgba(0,0,0,0.3);
         ">
-            <h1 class="neon-text" style="font-size: 5rem; color: #fff;">MMM . . .</h1>
-            <div style="background: rgba(255, 0, 255, 0.9); padding: 15px;">
-                <p style="color: white; font-weight: bold;">Sana y salva, te quedas por siempre en Bogotá.</p>
+            <h1 class="neon-text" style="font-size: 4rem; color: #fff; margin-bottom: 15px;">MMM . . .</h1>
+            
+            <div style="
+                background: rgba(255, 0, 255, 0.9); 
+                padding: 10px 15px; 
+                max-width: 80%; 
+                text-align: center;
+                border: 2px solid #fff; 
+            ">
+                <p style="
+                    color: white; 
+                    font-weight: bold; 
+                    margin: 0; 
+                    font-size: 1rem; 
+                    line-height: 1.4;
+                ">
+                    Sana y salva, te quedas por siempre en Bogotá.
+                </p>
             </div>
-            <button onclick="restartToCharacterSelect()" class="pixel-btn" style="padding: 15px 30px; font-size: 1.1rem;">JUGAR DE NUEVO</button>
+
+            <button onclick="restartToCharacterSelect()" class="pixel-btn" style="margin-top: 25px; padding: 15px 30px; font-size: 1.1rem;">JUGAR DE NUEVO</button>
         </div>`;
 }
 

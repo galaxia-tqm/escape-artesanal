@@ -149,7 +149,17 @@ function performJump() {
 
 document.addEventListener('keydown', (e) => { if (e.code === 'Space') performJump(); });
 canvas.addEventListener('mousedown', performJump);
-canvas.addEventListener('touchstart', (e) => { e.preventDefault(); performJump(); }, { passive: false });
+// CHANGED: Listen to 'window' instead of 'canvas' so tapping black bars works
+window.addEventListener('touchstart', (e) => {
+    // Only interfere if the game is actually running
+    if (isGameRunning) {
+        // Prevent scrolling/zooming while playing
+        e.preventDefault(); 
+        performJump();
+    }
+    // If game is NOT running (menus), we do nothing, 
+    // so your Start/Restart buttons still work.
+}, { passive: false });
 
 function spawnObstacle() {
     if (availableObstacles.length === 0) availableObstacles = [...obstacleIds];

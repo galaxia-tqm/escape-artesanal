@@ -4,6 +4,7 @@ const ctx = canvas.getContext('2d');
 // --- ASSETS & PRELOADING ---
 const characters = [1, 2, 3, 4, 5, 6, 7, 8];
 const obstacleIds = [9, 10, 11, 12, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46];
+const victoryNames = ['bunuelo', 'cafe', 'tamal'];
 
 let playerSprite = new Image(); 
 let selectedCharId = 1;
@@ -11,18 +12,20 @@ let objectsJumped = [];
 let obstacles = [];
 
 const imageLibrary = {};
-let totalAssets = characters.length + obstacleIds.length + 2; 
+// MATH: 8 chars + 37 obstacles + 3 victory + 2 (bg & splash) = 50 total images
+let totalAssets = characters.length + obstacleIds.length + victoryNames.length + 2; 
 let loadedAssets = 0;
 
 function checkLoadingProgress() {
     loadedAssets++;
     const startBtn = document.getElementById('start-btn');
+    
+    let percentage = Math.floor((loadedAssets / totalAssets) * 100);
     if (startBtn) {
-        let percentage = Math.floor((loadedAssets / totalAssets) * 100);
         startBtn.textContent = `CARGANDO ${percentage}%`;
     }
 
-    if (loadedAssets === totalAssets) {
+    if (loadedAssets >= totalAssets) {
         if (startBtn) {
             startBtn.textContent = "INICIAR";
             startBtn.disabled = false; 
@@ -31,25 +34,32 @@ function checkLoadingProgress() {
     }
 }
 
-// 1. Preload Background
+// 1. Preload Background & Splash (FIXED: Added onerror to prevent hanging)
 const bgImg = new Image();
 bgImg.onload = checkLoadingProgress;
+bgImg.onerror = checkLoadingProgress; // <--- This prevents the freeze
 bgImg.src = 'assets/background.jpg';
 
-// NEW: Preload Splash Screen Image for logic tracking
 const splashImg = new Image();
 splashImg.onload = checkLoadingProgress;
+splashImg.onerror = checkLoadingProgress; // <--- This prevents the freeze
 splashImg.src = 'assets/start.png';
 
-// 2. Preload Characters and Obstacles
+// 2. Preload Victory Screens
+victoryNames.forEach(name => {
+    const img = new Image();
+    img.onload = checkLoadingProgress;
+    img.onerror = checkLoadingProgress; 
+    img.src = `assets/${name}.png`;
+    imageLibrary[name] = img;
+});
+
+// 3. Preload Characters and Obstacles
 [...characters, ...obstacleIds].forEach(id => {
     const formattedId = id.toString().padStart(2, '0');
     const img = new Image();
     img.onload = checkLoadingProgress;
-    img.onerror = () => {
-        console.error(`Failed to load: assets/clay-${formattedId}.png`);
-        checkLoadingProgress(); // Still count it so game can start
-    };
+    img.onerror = checkLoadingProgress;
     img.src = `assets/clay-${formattedId}.png`;
     imageLibrary[formattedId] = img; 
 });
@@ -70,40 +80,26 @@ let bgX = 0;
 // --- RAIN ---
 let raindrops = [];
 const maxRain = 40;
-
-function createRaindrop() {
-    return {
+for (let i = 0; i < maxRain; i++) {
+    raindrops.push({
         x: Math.random() * canvas.width,
         y: Math.random() * -canvas.height,
         speed: 12 + Math.random() * 5,
         length: 15 + Math.random() * 10
-    };
-}
-
-for (let i = 0; i < maxRain; i++) {
-    raindrops.push(createRaindrop());
+    });
 }
 
 let obstacleTimer = 0;
 let nextSpawnThreshold = 50;
 
-// --- PLAYER ---
 const player = {
-    x: 50,
-    y: 450, 
-    width: 70,
-    height: 70,
-    dy: 0,
-    jumpPower: -24,
-    gravity: 1.6,
-    grounded: false,
-    jumpCount: 0,
-    maxJumps: 2
+    x: 50, y: 450, width: 70, height: 70, dy: 0,
+    jumpPower: -24, gravity: 1.6, grounded: false, jumpCount: 0, maxJumps: 2
 };
 
 const music = document.getElementById('bg-music');
 
-// --- START: CHARACTER SELECTION ---
+// --- CHARACTER SELECTION ---
 window.addEventListener('DOMContentLoaded', () => {
     const charGrid = document.getElementById('character-grid');
     if (charGrid) {
@@ -120,17 +116,19 @@ window.addEventListener('DOMContentLoaded', () => {
 
 function startGame(charId) {
     selectedCharId = charId;
-    // FIX: Assign the actual Image object from the library
     playerSprite = imageLibrary[charId]; 
-    
     availableObstacles = [...obstacleIds];
+
     document.getElementById('start-screen').classList.add('hidden');
+    
+    // Draw one frame so it's not black behind the tutorial
+    drawFrozenFrame();
     document.getElementById('tutorial-screen').classList.remove('hidden');
 }
 
 function beginGameplay() {
     document.getElementById('tutorial-screen').classList.add('hidden');
-    if (music) music.play().catch(e => console.log("Audio requires interaction"));
+    if (music) music.play().catch(e => console.log("Audio interaction required"));
     resetRound();
     isGameRunning = true;
     loop();
@@ -151,10 +149,7 @@ function performJump() {
 
 document.addEventListener('keydown', (e) => { if (e.code === 'Space') performJump(); });
 canvas.addEventListener('mousedown', performJump);
-canvas.addEventListener('touchstart', (e) => {
-    e.preventDefault();
-    performJump();
-}, { passive: false });
+canvas.addEventListener('touchstart', (e) => { e.preventDefault(); performJump(); }, { passive: false });
 
 function spawnObstacle() {
     if (availableObstacles.length === 0) availableObstacles = [...obstacleIds];
@@ -163,12 +158,8 @@ function spawnObstacle() {
     let formattedId = randId.toString().padStart(2, '0');
 
     obstacles.push({
-        x: canvas.width,
-        y: 480,
-        width: 60,
-        height: 60,
-        img: imageLibrary[formattedId], 
-        passed: false
+        x: canvas.width, y: 480, width: 60, height: 60,
+        img: imageLibrary[formattedId], passed: false
     });
 }
 
@@ -177,7 +168,6 @@ function loop() {
     distanceTraveled += gameSpeed / 80;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Background
     if (bgImg.complete) {
         const scale = canvas.height / bgImg.height;
         const renderWidth = bgImg.width * scale;
@@ -187,10 +177,8 @@ function loop() {
         ctx.drawImage(bgImg, Math.floor(bgX + renderWidth), 0, renderWidth + 1, canvas.height);
     }
 
-    // Rain
-    ctx.strokeStyle = 'rgba(200, 200, 220, 0.4)';
-    ctx.lineWidth = 1;
     raindrops.forEach(drop => {
+        ctx.strokeStyle = 'rgba(200, 200, 220, 0.4)';
         ctx.beginPath();
         ctx.moveTo(drop.x, drop.y);
         ctx.lineTo(drop.x, drop.y + drop.length);
@@ -199,7 +187,6 @@ function loop() {
         if (drop.y > canvas.height) { drop.y = -20; drop.x = Math.random() * canvas.width; }
     });
 
-    // Player Physics
     player.dy += player.gravity;
     player.y += player.dy;
     if (player.y + player.height > 540) {
@@ -210,7 +197,6 @@ function loop() {
     }
     ctx.drawImage(playerSprite, player.x, player.y, player.width, player.height);
 
-    // Obstacles
     obstacleTimer++;
     if (obstacleTimer > nextSpawnThreshold) {
         spawnObstacle();
@@ -225,7 +211,7 @@ function loop() {
 
         if (obs.x + obs.width < -100) { obstacles.splice(i, 1); i--; continue; }
 
-        const p = 12; // padding
+        const p = 12;
         if (player.x + p < obs.x + obs.width - p && player.x + player.width - p > obs.x + p &&
             player.y + p < obs.y + obs.height - p && player.y + player.height - p > obs.y + p) {
             endRound();
@@ -235,16 +221,14 @@ function loop() {
             obs.passed = true;
             roundScore += 10;
             objectsJumped.push(obs.img.src);
-            gameSpeed += 0.2; 
+            gameSpeed += 1; 
         }
     }
 
-    // HUD
     ctx.fillStyle = '#f0f';
     ctx.font = '20px "Courier New"';
     ctx.fillText(`Ronda: ${currentRound}/3 | Distancia: ${Math.floor(distanceTraveled)}m`, 20, 30);
     
-    // Progress Bar
     let progress = Math.min((totalScore + Math.floor(distanceTraveled)) / 250, 1);
     ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
     ctx.fillRect(20, 45, 200, 10);
@@ -261,6 +245,11 @@ function endRound() {
     totalScore += metersRun;
     roundScoresHistory.push(metersRun); 
     
+    if (currentRound >= maxRounds) {
+        showGameOver();
+        return;
+    }
+
     const list = document.getElementById('jumped-list');
     list.innerHTML = '';
     objectsJumped.forEach(imgSrc => {
@@ -274,19 +263,14 @@ function endRound() {
     document.getElementById('summary-screen').classList.remove('hidden');
 
     const nextBtn = document.getElementById('next-round-btn');
-    if (currentRound < maxRounds) {
-        nextBtn.textContent = "VOLVER A ESCAPAR";
-        nextBtn.onclick = () => {
-            currentRound++;
-            document.getElementById('summary-screen').classList.add('hidden');
-            resetRound();
-            isGameRunning = true;
-            loop();
-        };
-    } else {
-        nextBtn.textContent = "Ver Distancia Total";
-        nextBtn.onclick = showGameOver;
-    }
+    nextBtn.textContent = "VOLVER A ESCAPAR";
+    nextBtn.onclick = () => {
+        currentRound++;
+        document.getElementById('summary-screen').classList.add('hidden');
+        resetRound();
+        isGameRunning = true;
+        loop();
+    };
 }
 
 function resetRound() {
@@ -307,14 +291,21 @@ function showGameOver() {
     const breakdown = document.getElementById('score-breakdown');
     const title = endScreen.querySelector('h1');
     const storyBox = endScreen.querySelector('.narrative-box');
-    const mainReloadBtn = endScreen.querySelector('button[onclick="location.reload()"]');
+    
+    // FIXED: More robust selector to find the button even if HTML attributes vary slightly
+    // We look for any button that has the 'restartToCharacterSelect' function in its click handler
+    const restartBtn = endScreen.querySelector('button[onclick*="restartToCharacterSelect"]');
 
     endScreen.classList.remove('hidden');
 
     if (totalScore >= 250) {
+        // --- WIN (PANADERÍA) ---
+        
+        // Ensure the button is HIDDEN
+        if (restartBtn) restartBtn.style.display = 'none';
+
         breakdown.innerHTML = `<h2 style="color: #f0f;">RECORRES ${totalScore} METROS EN TOTAL</h2>`;
         title.innerHTML = "¡LLEGAS A UNA PANADERÍA!";
-        if(mainReloadBtn) mainReloadBtn.style.display = 'none';
         storyBox.innerHTML = `
             <p style="font-size: 1.6rem;">Entras y te...</p>
             <div style="display: flex; flex-direction: column; gap: 10px;">
@@ -323,52 +314,88 @@ function showGameOver() {
                 <button class="choice-btn" onclick="showVictoryScreen('tamal')">C) FUSIONAS CON UN TAMAL</button>
             </div>`;
     } else {
+        // --- LOSE (FRACASO) ---
+
+        // Ensure the button is SHOWN
+        if (restartBtn) restartBtn.style.display = 'block';
+
         const mathFormula = roundScoresHistory.join(" + ") + " = " + totalScore;
         breakdown.innerHTML = `<h2 style="font-size: 2em; color: #f0f;">${mathFormula} METROS</h2>`;
         title.textContent = "FRACASASTE";
+        
+        storyBox.innerHTML = `
+             <p>Te mudas a Costa Rica con tu turista.</p>
+             <p>Te das cuenta de que San José no está tan mal: también llueve; también, a veces, hace alguito de frío.</p> 
+        `;
     }
 }
 
 function showVictoryScreen(type) {
     const endScreen = document.getElementById('game-over-screen');
-    const images = { 'bunuelo': 'assets/bunuelo.png', 'cafe': 'assets/cafe.png', 'tamal': 'assets/tamal.png' };
-    endScreen.style.backgroundImage = `url('${images[type]}')`;
+    const preImg = imageLibrary[type];
+    
+    endScreen.style.padding = '0';
+    
+    endScreen.style.backgroundImage = `url('${preImg.src}')`;
     endScreen.style.backgroundSize = 'cover';
+    endScreen.style.backgroundPosition = 'center';
+    endScreen.style.backgroundRepeat = 'no-repeat';
+
     endScreen.innerHTML = `
-        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; width: 100%; background: rgba(0,0,0,0.3);">
+        <div style="
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            background: rgba(0,0,0,0.3);
+        ">
             <h1 class="neon-text" style="font-size: 5rem; color: #fff;">MMM . . .</h1>
             <div style="background: rgba(255, 0, 255, 0.9); padding: 15px;">
                 <p style="color: white; font-weight: bold;">Sana y salva, te quedas por siempre en Bogotá.</p>
             </div>
-            <button onclick="restartToCharacterSelect()">JUGAR DE NUEVO</button>
+            <button onclick="restartToCharacterSelect()" class="pixel-btn" style="padding: 15px 30px; font-size: 1.1rem;">JUGAR DE NUEVO</button>
         </div>`;
 }
 
-function goToCharacterSelect() {
-    document.getElementById('splash-screen').classList.add('hidden');
-    document.getElementById('start-screen').classList.remove('hidden');
-    if (music) music.play().catch(e => console.log("Music error"));
-}
-
-function toggleCredits() {
-    document.getElementById('credits-modal').classList.toggle('hidden');
+function drawFrozenFrame() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (bgImg.complete) {
+        const scale = canvas.height / bgImg.height;
+        ctx.drawImage(bgImg, 0, 0, bgImg.width * scale, canvas.height);
+    }
+    ctx.drawImage(playerSprite, player.x, player.y, player.width, player.height);
 }
 
 function restartToCharacterSelect() {
-    // 1. Hide the Game Over screen
     document.getElementById('game-over-screen').classList.add('hidden');
-    
-    // 2. Show the Character Selection screen
     document.getElementById('start-screen').classList.remove('hidden');
-
-    // 3. Reset all global game variables
+    document.getElementById('game-over-screen').style.backgroundImage = '';
     currentRound = 1;
     totalScore = 0;
     roundScore = 0;
     distanceTraveled = 0;
     roundScoresHistory = [];
     isGameRunning = false;
-    
-    // 4. Stop any leftover music or animations
     cancelAnimationFrame(animationId);
+}
+
+function goToCharacterSelect() {
+    document.getElementById('splash-screen').classList.add('hidden');
+    document.getElementById('start-screen').classList.remove('hidden');
+    
+    if (music) {
+        music.play().catch(e => console.log("Music requires interaction"));
+    }
+}
+
+function toggleCredits() {
+    const modal = document.getElementById('credits-modal');
+    if (modal) {
+        modal.classList.toggle('hidden');
+    }
 }

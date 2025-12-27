@@ -538,3 +538,44 @@ button:disabled {
     from { transform: scale(1); opacity: 0.6; }
     to { transform: scale(1.02); opacity: 1; }
 }
+
+/* --- TUTORIAL OVERLAY --- */
+
+/* Makes the background transparent so you see the 'frozen' game */
+#tutorial-screen {
+    background: rgba(0, 0, 0, 0.6) !important; 
+    z-index: 80;
+}
+
+/* The square box container */
+.tutorial-content {
+    background: #111;
+    border: 3px solid #f0f;
+    padding: 40px 30px 20px 30px;
+    text-align: center;
+    font-family: 'Press Start 2P', cursive;
+    color: white;
+    max-width: 80%;
+    position: relative;
+    box-shadow: 0 0 20px #f0f;
+}
+
+/* The X in the corner */
+.tutorial-close-x {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 1.5rem;
+    color: #f0f;
+    cursor: pointer;
+	padding: 10px;
+}
+
+/* Specific override for the summary screen button to make it smaller */
+#next-round-btn {
+    font-size: 0.9rem !important;    /* Reduced from 1.5rem */
+    padding: 12px 20px !important;   /* Reduced from 20px 40px */
+    margin-top: 15px !important;     /* Adjust spacing from the icons */
+    box-shadow: 4px 4px 0px #000;    /* Slightly smaller shadow */
+    width: auto;                     /* Ensures it doesn't stretch too wide */
+}

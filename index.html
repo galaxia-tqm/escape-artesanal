@@ -50,49 +50,38 @@
             <div id="character-grid"></div>
         </div>
 
-<div id="tutorial-screen" class="ui-screen hidden" style="z-index: 50;">
-            
-            <div style="text-align: center; margin-bottom: 40px;">
-                <p style="color: #fff; font-size: 1.5rem; margin-bottom: 25px; font-weight: bold; letter-spacing: 2px;">
-                    ESPACIO = SALTO
-                </p>
-                <p style="color: #fff; font-size: 1.5rem; font-weight: bold; letter-spacing: 2px; margin-bottom: 40px;">
-                    ESPACIO X 2 = DOBLE SALTO
-                </p>
-
-                <p style="color: #f0f; font-size: 1.3rem; font-weight: bold; letter-spacing: 1px; text-transform: uppercase;">
-                    OBJETIVO: RECORRE 250 METROS
-                </p>
-            </div>
-
-            <button onclick="beginGameplay()">ENTENDIDO</button>
+<div id="tutorial-screen" class="ui-screen hidden">
+    <div class="tutorial-content">
+        <span class="tutorial-close-x" onclick="beginGameplay()">x</span> 
+        <div style="margin-bottom: 30px;">
+            <p style="color: #fff; font-size: 1rem; margin-bottom: 15px;">ESPACIO = SALTO</p> 
+            <p style="color: #fff; font-size: 1rem; margin-bottom: 25px;">ESPACIO x2 = DOBLE SALTO</p> 
+            <p style="color: #f0f; font-size: 0.9rem;">OBJETIVO: RECORRE 250 METROS</p> 
         </div>
+    </div>
+</div>
 
-        <div id="summary-screen" class="ui-screen hidden">
-            <h2>TE HAS TROPEZADO CON UNA ARTESANÍA</h2>
-           <div id="round-score">Puntaje: 0</div>
-            <h3>Artesanías esquivadas:</h3>
-            <ul id="jumped-list"></ul>
-            <button id="next-round-btn">VOLVER A ESCAPAR</button>
-        </div>
+<div id="summary-screen" class="ui-screen hidden">
+    <h2>TE HAS TROPEZADO CON UNA ARTESANÍA</h2>
+    <div id="round-score">Puntaje: 0</div>
+    <h3>Artesanías esquivadas:</h3>
+    <ul id="jumped-list"></ul>
+    <button id="next-round-btn" class="pixel-btn">VOLVER A ESCAPAR</button>
+</div>
 
-        <div id="game-over-screen" class="ui-screen hidden">
-            <div id="score-breakdown" style="margin-top: 10px; margin-bottom: 20px;"></div>
+<div id="game-over-screen" class="ui-screen hidden">
+    <div id="score-breakdown" style="margin-top: 10px; margin-bottom: 20px;"></div>
+    <h1 class="neon-text title-large">FRACASASTE</h1> 
+    <div class="narrative-box" style="margin-bottom: 20px;">
+        <p>Te mudas a Costa Rica con tu turista.</p>
+        <p>Te das cuenta de que San José no está tan mal: también llueve; también, a veces, hace alguito de frío.</p> 
+    </div>
+    <button class="pixel-btn" onclick="restartToCharacterSelect()">Jugar de Nuevo</button>
+</div>
 
-            <h1 class="neon-text title-large">FRACASASTE</h1> 
+<canvas id="gameCanvas" width="800" height="600"></canvas>
 
-            <div class="narrative-box" style="margin-bottom: 20px;">
-                <p>Te mudas a Costa Rica con tu turista.</p>
-                <p>Te das cuenta de que San José no está tan mal: también llueve; también, a veces, hace alguito de frío.</p> 
-            </div>
-
-            <button onclick="restartToCharacterSelect()">Jugar de Nuevo</button>
-            
-            <h2 id="final-score" style="display:none;">Distancia Total: 0</h2>
-        </div>
-
-        <canvas id="gameCanvas" width="800" height="600"></canvas>
-    </div> <audio id="bg-music" loop>
+ <audio id="bg-music" loop>
         <source src="assets/music.mp3" type="audio/mpeg">
     </audio>
 

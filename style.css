@@ -1,0 +1,540 @@
+:root {
+    --primary-neon: #f0f;
+}
+
+body {
+    background-color: #222;
+    color: white;
+    font-family: 'Courier New', Courier, monospace;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+
+-webkit-user-select: none; /* Safari / Chrome / Mobile */
+    -moz-user-select: none;    /* Firefox */
+    -ms-user-select: none;     /* Edge */
+    user-select: none;         /* Standard */
+}
+
+
+#game-container {
+    position: relative;
+    width: 800px;
+    height: 600px;
+    border: none;
+    background-color: #000;
+}
+
+/* Base style for all screens */
+.ui-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    color: var(--primary-neon);
+    text-align: center;
+}
+
+/* --- NARRATIVE SECTION --- */
+.narrative-box {
+    max-width: 650px;
+    margin: 10px auto;
+    padding: 10px 20px;
+    background: transparent;
+    text-align: center;
+}
+
+.narrative-box p {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.1rem;
+    line-height: 1.5;
+    color: #fff;
+    margin-bottom: 5px;
+    text-transform: none !important;
+}
+
+.highlight-text {
+    font-weight: bold;
+    color: var(--primary-neon) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 2px;
+    display: block;
+    margin-top: 10px;
+}
+
+/* Typography refinements */
+.title-large {
+    font-size: 3.2rem !important;
+    margin-bottom: 5px !important;
+}
+
+.neon-text-small {
+    font-size: 1.1rem;
+    margin-top: 10px !important;
+    margin-bottom: 15px !important;
+    letter-spacing: 1px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.ui-screen h1 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    animation: glitch 1s linear infinite;
+    text-shadow: 2px 2px #0ff, -2px -2px var(--primary-neon);
+}
+
+.ui-screen h2, .ui-screen h3, .ui-screen p {
+    color: var(--primary-neon);
+    text-transform: uppercase;
+    margin: 10px 0;
+}
+
+/* --- BUTTONS --- */
+@keyframes neon-pulse {
+    0% { box-shadow: 0 0 10px var(--primary-neon); transform: scale(1); }
+    50% { box-shadow: 0 0 30px var(--primary-neon), 0 0 10px #fff; transform: scale(1.05); }
+    100% { box-shadow: 0 0 10px var(--primary-neon); transform: scale(1); }
+}
+
+button {
+    background-color: var(--primary-neon);
+    color: #000;
+    border: 2px solid var(--primary-neon);
+    padding: 15px 30px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: crosshair;
+    margin-top: 20px;
+    text-transform: uppercase;
+    animation: neon-pulse 1.5s infinite ease-in-out;
+    transition: all 0.2s ease;
+}
+
+button:hover {
+    background-color: #fff;
+    color: var(--primary-neon);
+    border-color: var(--primary-neon);
+    box-shadow: 0 0 50px var(--primary-neon), 0 0 20px #fff;
+    transform: scale(1.15) !important;
+    animation: none;
+}
+
+#character-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-top: 10px;
+    z-index: 20;
+}
+
+.char-select-img {
+    width: 70px;
+    height: 70px;
+    border: 2px solid transparent;
+    cursor: crosshair;
+    object-fit: contain;
+    background: transparent;
+    transition: 0.2s;
+}
+
+.char-select-img:hover {
+    background-color: var(--primary-neon);
+    border-color: var(--primary-neon);
+    transform: scale(1.1);
+    box-shadow: 0 0 20px var(--primary-neon);
+}
+
+@keyframes glitch {
+    0% { transform: translate(0); text-shadow: 2px 2px #0ff, -2px -2px var(--primary-neon); }
+    25% { transform: translate(-2px, 1px); }
+    50% { transform: translate(2px, -1px); text-shadow: -2px 2px #0ff, 2px -2px var(--primary-neon); }
+    75% { transform: translate(-1px, -1px); }
+    100% { transform: translate(0); text-shadow: 2px 2px #0ff, -2px -2px var(--primary-neon); }
+}
+
+ul {
+    max-height: 150px;
+    overflow-y: auto;
+    list-style: none;
+    padding: 0;
+    width: 60%;
+}
+
+#jumped-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 80%;
+}
+
+.summary-img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    border: none;
+    background: transparent;
+    padding: 2px;
+}
+
+/* --- SPLASH SCREEN (DESKTOP) --- */
+#splash-screen {
+    background-image: url('assets/start.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.title-container {
+    background: transparent !important;
+    padding: 0 !important;
+    border-radius: 15px;
+    margin-bottom: 40px;
+    width: 90%;
+}
+
+.pixel-title {
+    font-family: 'Press Start 2P', cursive;
+    color: #FFD700;
+    font-size: 1.8rem !important;
+    line-height: 1.5;
+    margin: 10px 0;
+    text-transform: uppercase;
+    text-shadow: 4px 4px 0px #3d1403, -1px -1px 0px #000, 1px -1px 0px #000, -1px 1px 0px #000, 1px 1px 0px #000;
+    animation: none !important;
+}
+
+.pixel-subtitle {
+    font-family: 'Press Start 2P', cursive;
+    color: #fff;
+    font-size: 1.2rem !important;
+    margin: 10px 0;
+    text-shadow: 3px 3px 0px #000;
+    animation: none !important;
+}
+
+.pixel-btn {
+    font-family: 'Press Start 2P', cursive;
+    background-color: #ff00ff;
+    color: white;
+    font-size: 1.5rem !important;
+    padding: 20px 40px !important;
+    border: 4px solid #fff;
+    box-shadow: 6px 6px 0px #000;
+    cursor: pointer;
+    text-transform: uppercase;
+    animation: text-pulse 1s infinite;
+}
+
+.pixel-btn:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0px #000;
+    background-color: #fff;
+    color: #ff00ff;
+    border-color: #ff00ff;
+}
+
+/* --- GAME OVER CENTERING --- */
+#game-over-screen {
+    justify-content: center;
+    padding-bottom: 20px;
+}
+#game-over-screen h1 {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+#game-over-screen button {
+    margin-bottom: 0;
+}
+
+/* --- GLOBAL SUMMARY SCREEN --- */
+#summary-screen > h2 {
+    font-size: 1.8rem !important;
+    text-shadow: 0 0 5px var(--primary-neon) !important;
+    margin-bottom: 20px !important;
+}
+
+#round-score h2 {
+    text-transform: none !important;
+    font-size: 1.5rem !important;
+    letter-spacing: 2px;
+    margin-bottom: 50px !important;
+}
+
+.choice-btn {
+    background: transparent;
+    border: 1px solid var(--primary-neon);
+    color: #fff;
+    padding: 10px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    animation: none;
+}
+.choice-btn:hover {
+    background: var(--primary-neon);
+    color: #000;
+    box-shadow: 0 0 15px var(--primary-neon);
+    transform: scale(1.02);
+}
+
+/* =========================================
+   MOBILE & ORIENTATION CONTROLS
+   ========================================= */
+
+/* 1. DEFAULT: Hide the "Please Rotate" message */
+#rotate-message {
+    display: none;
+}
+
+/* 2. PORTRAIT MODE (Vertical) */
+@media only screen and (orientation: portrait) {
+    #rotate-message {
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: #000;
+        color: var(--primary-neon);
+        z-index: 9999;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 30px;
+        box-sizing: border-box;
+    }
+    #rotate-message p {
+        max-width: 100%;
+        word-wrap: break-word;
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+    #game-container {
+        display: none !important;
+    }
+}
+
+/* 3. LANDSCAPE MODE (Horizontal) - MOBILE FIXES */
+@media only screen and (orientation: landscape) and (max-width: 950px) {
+    
+    body {
+        padding: 0;
+        margin: 0;
+        background-color: #000;
+        overflow: hidden;
+    }
+
+    #game-container {
+        width: 100vw;
+        height: 100vh;
+        max-width: none;
+        border: none;
+        background: #000;
+    }
+    
+    canvas {
+        width: auto;
+        height: 100%;
+        aspect-ratio: 4/3;
+        margin: 0 auto;
+        display: block;
+    }
+
+    /* FIX 1: Splash Screen Image */
+    #splash-screen {
+        background-size: cover !important;
+        background-position: center center !important;
+        width: 100vw;
+        height: 100vh;
+    }
+
+    /* --- UI SCALING --- */
+    .ui-screen {
+        justify-content: center;
+        padding-top: 0;
+    }
+    .ui-screen h1, .ui-screen h1.title-large {
+        font-size: 1.4rem !important;
+        margin: 2px 0 5px 0 !important;
+    }
+    .narrative-box {
+        width: 90%;
+        padding: 4px 10px;
+        margin: 2px auto;
+        background: transparent;
+    }
+    .narrative-box p {
+        font-size: 0.7rem !important;
+        line-height: 1.2;
+        margin-bottom: 2px;
+    }
+
+    /* FIX 2: Game Over Math Size */
+    #score-breakdown, 
+    #score-breakdown h1, 
+    #score-breakdown h2, 
+    #score-breakdown h3,
+    #score-breakdown span {
+        font-size: 1.1rem !important;
+        margin: 5px 0 !important;
+        line-height: 1.2 !important;
+        width: 100%;
+    }
+    #score-breakdown {
+        width: 100%;
+        word-wrap: break-word;
+    }
+    #final-score {
+        font-size: 0.9rem !important;
+        margin: 2px 0 !important;
+    }
+    #game-over-screen button {
+        padding: 8px 15px !important;
+        font-size: 0.8rem !important;
+        margin-top: 5px !important;
+        width: auto;
+    }
+
+    /* FIX 3: Summary Screen List (NO SCROLLING) */
+    ul, #jumped-list {
+        max-height: none !important;   /* Deletes the height limit */
+        overflow: visible !important;  /* Deletes the scrollbar */
+        display: flex !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        padding: 0 !important;
+        margin: 5px auto !important;
+        width: 95% !important;
+    }
+    .summary-img {
+        width: 30px !important; /* Smaller icons to fit more on screen */
+        height: 30px !important;
+        margin: 0 !important;
+    }
+    #summary-screen h3 {
+        font-size: 0.8rem !important;
+        margin: 2px 0 !important;
+    }
+
+    /* --- START SCREEN FIXES --- */
+    .neon-text-small {
+        font-size: 0.8rem !important;
+        margin: 2px 0 !important;
+    }
+    #character-grid {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 8px;
+        margin-top: 8px;
+        justify-content: center;
+    }
+    .char-select-img {
+        width: 30px;
+        height: 30px;
+    }
+    .title-container {
+        width: 100%;
+        padding: 0 10px !important;
+    }
+    .pixel-title {
+        font-size: 1.0rem !important;
+        line-height: 1.4;
+    }
+}
+
+/* --- SECCIÓN DE CRÉDITOS --- */
+
+/* Texto pequeño "créditos" en la pantalla de inicio */
+.credits-footer {
+    position: absolute;
+    bottom: 15px; 
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Press Start 2P', cursive;
+    font-size: 0.55rem; 
+    color: rgba(255, 255, 255, 0.7); 
+    cursor: pointer;
+    text-transform: lowercase;
+    z-index: 70; 
+    transition: color 0.2s;
+}
+
+.credits-footer:hover {
+    color: #f0f; 
+}
+
+/* Ventana emergente (Modal) */
+#credits-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; 
+}
+
+.credits-content {
+    background: #111;
+    border: 3px solid #f0f;
+    padding: 35px 25px 25px 25px; /* Aumentamos el padding superior para que la X no choque con el texto */
+    text-align: center;
+    font-family: 'Press Start 2P', cursive;
+    color: white;
+    max-width: 80%;
+    position: relative; /* ESTO ES NUEVO: permite que la X se ubique respecto a este cuadro */
+}
+
+/* Estilo de la X de cierre */
+.close-x {
+    position: absolute;
+    top: 10px;    /* Distancia desde arriba */
+    right: 15px;  /* Distancia desde la derecha */
+    font-size: 1.2rem;
+    color: #f0f;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.close-x:hover {
+    color: white;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* This makes the button pulse slightly while it is disabled/loading */
+button:disabled {
+    opacity: 0.7;
+    cursor: wait;
+    animation: loading-pulse 1s infinite alternate;
+}
+
+@keyframes loading-pulse {
+    from { transform: scale(1); opacity: 0.6; }
+    to { transform: scale(1.02); opacity: 1; }
+}

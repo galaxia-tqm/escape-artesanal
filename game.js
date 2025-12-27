@@ -445,3 +445,17 @@ function toggleCredits() {
         modal.classList.toggle('hidden');
     }
 }
+
+// --- PAUSE MUSIC WHEN TAB IS HIDDEN/PHONE LOCKED ---
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+        // The user left the tab or locked the phone
+        if (music) music.pause();
+    } else {
+        // The user came back. Only resume if we are past the splash screen.
+        const splashScreen = document.getElementById('splash-screen');
+        if (music && splashScreen && splashScreen.classList.contains('hidden')) {
+            music.play().catch(e => console.log("Resume failed:", e));
+        }
+    }
+});

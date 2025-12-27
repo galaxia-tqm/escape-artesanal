@@ -11,7 +11,7 @@ let objectsJumped = [];
 let obstacles = [];
 
 const imageLibrary = {};
-let totalAssets = characters.length + obstacleIds.length + 1; 
+let totalAssets = characters.length + obstacleIds.length + 2; 
 let loadedAssets = 0;
 
 function checkLoadingProgress() {
@@ -35,6 +35,11 @@ function checkLoadingProgress() {
 const bgImg = new Image();
 bgImg.onload = checkLoadingProgress;
 bgImg.src = 'assets/background.jpg';
+
+// NEW: Preload Splash Screen Image for logic tracking
+const splashImg = new Image();
+splashImg.onload = checkLoadingProgress;
+splashImg.src = 'assets/start.png';
 
 // 2. Preload Characters and Obstacles
 [...characters, ...obstacleIds].forEach(id => {
@@ -335,7 +340,7 @@ function showVictoryScreen(type) {
             <div style="background: rgba(255, 0, 255, 0.9); padding: 15px;">
                 <p style="color: white; font-weight: bold;">Sana y salva, te quedas por siempre en Bogotá.</p>
             </div>
-            <button onclick="location.reload()">JUGAR DE NUEVO</button>
+            <button onclick="restartToCharacterSelect()">JUGAR DE NUEVO</button>
         </div>`;
 }
 
@@ -347,4 +352,23 @@ function goToCharacterSelect() {
 
 function toggleCredits() {
     document.getElementById('credits-modal').classList.toggle('hidden');
+}
+
+function restartToCharacterSelect() {
+    // 1. Hide the Game Over screen
+    document.getElementById('game-over-screen').classList.add('hidden');
+    
+    // 2. Show the Character Selection screen
+    document.getElementById('start-screen').classList.remove('hidden');
+
+    // 3. Reset all global game variables
+    currentRound = 1;
+    totalScore = 0;
+    roundScore = 0;
+    distanceTraveled = 0;
+    roundScoresHistory = [];
+    isGameRunning = false;
+    
+    // 4. Stop any leftover music or animations
+    cancelAnimationFrame(animationId);
 }

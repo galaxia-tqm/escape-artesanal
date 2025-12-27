@@ -34,15 +34,15 @@ function checkLoadingProgress() {
     }
 }
 
-// 1. Preload Background & Splash (FIXED: Added onerror to prevent hanging)
+// 1. Preload Background & Splash
 const bgImg = new Image();
 bgImg.onload = checkLoadingProgress;
-bgImg.onerror = checkLoadingProgress; // <--- This prevents the freeze
+bgImg.onerror = checkLoadingProgress;
 bgImg.src = 'assets/background.jpg';
 
 const splashImg = new Image();
 splashImg.onload = checkLoadingProgress;
-splashImg.onerror = checkLoadingProgress; // <--- This prevents the freeze
+splashImg.onerror = checkLoadingProgress;
 splashImg.src = 'assets/start.png';
 
 // 2. Preload Victory Screens
@@ -288,45 +288,49 @@ function resetRound() {
 function showGameOver() {
     document.getElementById('summary-screen').classList.add('hidden');
     const endScreen = document.getElementById('game-over-screen');
-    const breakdown = document.getElementById('score-breakdown');
-    const title = endScreen.querySelector('h1');
-    const storyBox = endScreen.querySelector('.narrative-box');
     
-    // FIXED: More robust selector to find the button even if HTML attributes vary slightly
-    // We look for any button that has the 'restartToCharacterSelect' function in its click handler
-    const restartBtn = endScreen.querySelector('button[onclick*="restartToCharacterSelect"]');
-
+    // NOTE: Elements inside might be missing if previous round was a victory
+    // The restartToCharacterSelect function now handles restoring them.
+    let breakdown = document.getElementById('score-breakdown');
+    let title = endScreen.querySelector('h1');
+    let storyBox = endScreen.querySelector('.narrative-box');
+    
     endScreen.classList.remove('hidden');
 
     if (totalScore >= 250) {
         // --- WIN (PANADERÍA) ---
-        
-        // Ensure the button is HIDDEN
+        // Find the restart button if it exists and HIDE it
+        const restartBtn = endScreen.querySelector('button[onclick*="restartToCharacterSelect"]');
         if (restartBtn) restartBtn.style.display = 'none';
 
-        breakdown.innerHTML = `<h2 style="color: #f0f;">RECORRES ${totalScore} METROS EN TOTAL</h2>`;
-        title.innerHTML = "¡LLEGAS A UNA PANADERÍA!";
-        storyBox.innerHTML = `
-            <p style="font-size: 1.6rem;">Entras y te...</p>
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-                <button class="choice-btn" onclick="showVictoryScreen('bunuelo')">A) ENTIERRAS EN UN BUÑUELO</button>
-                <button class="choice-btn" onclick="showVictoryScreen('cafe')">B) ZAMBULLES EN UN CAFÉ</button>
-                <button class="choice-btn" onclick="showVictoryScreen('tamal')">C) FUSIONAS CON UN TAMAL</button>
-            </div>`;
+        if (breakdown) breakdown.innerHTML = `<h2 style="color: #f0f;">RECORRES ${totalScore} METROS EN TOTAL</h2>`;
+        if (title) title.innerHTML = "¡LLEGAS A UNA PANADERÍA!";
+        
+        if (storyBox) {
+            storyBox.innerHTML = `
+                <p style="font-size: 1.6rem;">Entras y te...</p>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <button class="choice-btn" onclick="showVictoryScreen('bunuelo')">A) ENTIERRAS EN UN BUÑUELO</button>
+                    <button class="choice-btn" onclick="showVictoryScreen('cafe')">B) ZAMBULLES EN UN CAFÉ</button>
+                    <button class="choice-btn" onclick="showVictoryScreen('tamal')">C) FUSIONAS CON UN TAMAL</button>
+                </div>`;
+        }
     } else {
         // --- LOSE (FRACASO) ---
-
-        // Ensure the button is SHOWN
+        // Find the restart button and ensure it is VISIBLE
+        const restartBtn = endScreen.querySelector('button[onclick*="restartToCharacterSelect"]');
         if (restartBtn) restartBtn.style.display = 'block';
 
         const mathFormula = roundScoresHistory.join(" + ") + " = " + totalScore;
-        breakdown.innerHTML = `<h2 style="font-size: 2em; color: #f0f;">${mathFormula} METROS</h2>`;
-        title.textContent = "FRACASASTE";
+        if (breakdown) breakdown.innerHTML = `<h2 style="font-size: 2em; color: #f0f;">${mathFormula} METROS</h2>`;
+        if (title) title.textContent = "FRACASASTE";
         
-        storyBox.innerHTML = `
-             <p>Te mudas a Costa Rica con tu turista.</p>
-             <p>Te das cuenta de que San José no está tan mal: también llueve; también, a veces, hace alguito de frío.</p> 
-        `;
+        if (storyBox) {
+            storyBox.innerHTML = `
+                 <p>Te mudas a Costa Rica con tu turista.</p>
+                 <p>Te das cuenta de que San José no está tan mal: también llueve; también, a veces, hace alguito de frío.</p> 
+            `;
+        }
     }
 }
 
@@ -341,6 +345,7 @@ function showVictoryScreen(type) {
     endScreen.style.backgroundPosition = 'center';
     endScreen.style.backgroundRepeat = 'no-repeat';
 
+    // THIS OVERWRITES THE HTML. restartToCharacterSelect MUST FIX THIS.
     endScreen.innerHTML = `
         <div style="
             position: absolute;
@@ -372,9 +377,7 @@ function drawFrozenFrame() {
 }
 
 function restartToCharacterSelect() {
-    document.getElementById('game-over-screen').classList.add('hidden');
-    document.getElementById('start-screen').classList.remove('hidden');
-    document.getElementById('game-over-screen').style.backgroundImage = '';
+    // 1. Reset logic variables
     currentRound = 1;
     totalScore = 0;
     roundScore = 0;
@@ -382,6 +385,24 @@ function restartToCharacterSelect() {
     roundScoresHistory = [];
     isGameRunning = false;
     cancelAnimationFrame(animationId);
+
+    // 2. Hide Screen
+    const endScreen = document.getElementById('game-over-screen');
+    endScreen.classList.add('hidden');
+    endScreen.style.backgroundImage = '';
+    endScreen.style.padding = '';
+
+    // 3. IMPORTANT: Restore the original HTML structure of the Game Over screen
+    // This fixes the bug where "Fracasaste" screen disappears after a Victory.
+    endScreen.innerHTML = `
+        <div id="score-breakdown" style="margin-top: 10px; margin-bottom: 20px;"></div>
+        <h1 class="neon-text title-large">FRACASASTE</h1> 
+        <div class="narrative-box" style="margin-bottom: 20px;"></div>
+        <button class="pixel-btn" onclick="restartToCharacterSelect()">Jugar de Nuevo</button>
+    `;
+
+    // 4. Show Start Screen
+    document.getElementById('start-screen').classList.remove('hidden');
 }
 
 function goToCharacterSelect() {
